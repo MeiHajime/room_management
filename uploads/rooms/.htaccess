@@ -1,0 +1,14 @@
+# Chặn thực thi PHP trong thư mục uploads (bảo mật)
+<Files "*.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+<Files "*.phtml">
+    Order Allow,Deny
+    Deny from all
+</Files>
+<Files "*.html">
+    Order Allow,Deny
+    Deny from all
+</Files>
+Options -Indexes
