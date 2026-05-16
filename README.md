@@ -53,29 +53,36 @@ quanLyPhongTro/
 ## 🚀 Cài đặt và chạy
 
 ### Yêu cầu
+
 - PHP ≥ 7.4
 - MySQL ≥ 5.7 / MariaDB ≥ 10.3
 - XAMPP / WAMP / Laragon (hoặc bất kỳ web server nào)
 
 ### Bước 1: Clone / Copy project
+
 Đặt thư mục `quanLyPhongTro` vào `htdocs` (XAMPP) hoặc `www` (WAMP):
+
 ```
 C:\xampp\htdocs\quanLyPhongTro\
 ```
 
 ### Bước 2: Tạo Database
+
 1. Mở **phpMyAdmin** → `http://localhost/phpmyadmin`
 2. Tạo database mới tên `quan_ly_phong_tro`
 3. Chọn database vừa tạo → tab **SQL**
 4. Copy nội dung file `database/quanLyPhongTro.sql` và chạy
 
 Hoặc chạy qua command line:
+
 ```bash
 mysql -u root -p < database/quanLyPhongTro.sql
 ```
 
 ### Bước 3: Cấu hình Database
+
 Mở file `config/database.php` và chỉnh:
+
 ```php
 define('DB_HOST',     'localhost');
 define('DB_USER',     'root');       // username MySQL của bạn
@@ -84,6 +91,7 @@ define('BASE_URL',    'http://localhost/quanLyPhongTro');
 ```
 
 ### Bước 4: Phân quyền thư mục uploads
+
 ```bash
 # Linux/Mac
 chmod 755 uploads/rooms/
@@ -92,23 +100,25 @@ chmod 755 uploads/rooms/
 ```
 
 ### Bước 5: Truy cập
-- **Trang chủ:**  `http://localhost/quanLyPhongTro/index.php`
+
+- **Trang chủ:** `http://localhost/quanLyPhongTro/index.php`
 - **Đăng nhập:** `http://localhost/quanLyPhongTro/auth/login.php`
-- **Admin:**     `http://localhost/quanLyPhongTro/admin/index.php`
+- **Admin:** `http://localhost/quanLyPhongTro/admin/index.php`
 
 ---
 
 ## 🔑 Tài khoản Demo
 
-| Vai trò | Username | Password |
-|---------|----------|----------|
+| Vai trò | Username       | Password    |
+| ------- | -------------- | ----------- |
 | Admin   | `admin`        | `Admin@123` |
-| User    | `nguyen_van_a` | `User@123` |
-| User    | `tran_thi_b`   | `User@123` |
+| User    | `nguyen_van_a` | `User@123`  |
+| User    | `tran_thi_b`   | `User@123`  |
 
 > ⚠️ **Lưu ý:** Đổi mật khẩu trước khi deploy lên production!
 >
 > Hash bcrypt trong file SQL là của chuỗi `"password"`. Để tạo hash mới:
+>
 > ```php
 > echo password_hash('MatKhauMoi@123', PASSWORD_BCRYPT);
 > ```
@@ -118,6 +128,7 @@ chmod 755 uploads/rooms/
 ## ✅ Tính năng
 
 ### Người dùng (Frontend)
+
 - [x] Trang chủ với hero banner + bộ lọc tìm kiếm
 - [x] Danh sách phòng trọ dạng grid với phân trang
 - [x] Tìm kiếm theo từ khóa, tỉnh thành, loại phòng, khoảng giá
@@ -126,6 +137,7 @@ chmod 755 uploads/rooms/
 - [x] Validation form phía server
 
 ### Quản trị (Admin)
+
 - [x] Dashboard với biểu đồ thống kê (Chart.js)
 - [x] Quản lý phòng trọ: Thêm / Sửa / Xóa mềm
 - [x] Duyệt phòng / Ẩn/Hiện phòng trọ
@@ -148,13 +160,13 @@ khu_vuc (1) ────────── (N) phong_tro
 
 ### Mô tả bảng
 
-| Bảng | Mô tả |
-|------|-------|
-| `users` | Tài khoản người dùng và admin |
-| `loai_phong` | Danh mục loại phòng (phòng trọ, mini, CHDV...) |
-| `phong_tro` | Tin đăng phòng trọ chính |
-| `hinh_anh_phong` | Ảnh phụ kèm theo tin đăng |
-| `khu_vuc` | Khu vực phòng trọ |
+| Bảng             | Mô tả                                          |
+| ---------------- | ---------------------------------------------- |
+| `users`          | Tài khoản người dùng và admin                  |
+| `loai_phong`     | Danh mục loại phòng (phòng trọ, mini, CHDV...) |
+| `phong_tro`      | Tin đăng phòng trọ chính                       |
+| `hinh_anh_phong` | Ảnh phụ kèm theo tin đăng                      |
+| `khu_vuc`        | Khu vực phòng trọ                              |
 
 ---
 
