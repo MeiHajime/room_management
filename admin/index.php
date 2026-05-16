@@ -15,9 +15,11 @@ $stats = [
 
 // Tin đăng mới nhất
 $recentRooms = $db->query(
-    "SELECT p.id, p.tieu_de, p.gia, p.trang_thai, p.created_at, u.ho_ten as chu_tro
-     FROM phong_tro p LEFT JOIN users u ON p.user_id = u.id
-     ORDER BY p.created_at DESC LIMIT 8"
+    "SELECT p.id, td.tieu_de, td.gia, td.trang_thai, td.created_at, u.ho_ten as chu_tro
+     FROM phong_tro p 
+     LEFT JOIN tin_dang td ON p.id = td.phong_tro_id
+     LEFT JOIN users u ON p.user_id = u.id
+     ORDER BY td.created_at DESC LIMIT 8"
 )->fetch_all(MYSQLI_ASSOC);
 
 // Chart data — số tin theo 6 tháng gần nhất

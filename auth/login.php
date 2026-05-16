@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="auth-wrapper">
     <div class="auth-card">
         <div class="auth-logo">
-            <div class="logo-icon">🏠</div>
+            <a href="<?= BASE_URL ?>/index.php" class="logo-icon">🏠</a>
             <h1 class="auth-title">Đăng nhập</h1>
             <p class="auth-subtitle">Chào mừng trở lại VinhRooms</p>
         </div>

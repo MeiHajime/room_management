@@ -74,9 +74,10 @@ $currentUser = getCurrentUser();
 
 // Tin đăng của user
 $myRooms = $db->query(
-    "SELECT id, tieu_de, gia, trang_thai, created_at, hinh_anh
-     FROM phong_tro
-     WHERE user_id=$uid AND trang_thai != 'bi_xoa'
+    "SELECT td.id, td.tieu_de, td.gia, td.trang_thai, td.created_at, p.hinh_anh
+     FROM phong_tro p
+     join tin_dang td on td.phong_tro_id = p.id
+     WHERE user_id=$uid
      ORDER BY created_at DESC LIMIT 10"
 )->fetch_all(MYSQLI_ASSOC);
 
@@ -247,7 +248,7 @@ require_once __DIR__ . '/includes/header.php';
                             <td style="padding:.65rem 1rem;font-weight:700;color:var(--primary);white-space:nowrap;font-size:.875rem">
                                 <?= formatPrice($r['gia']) ?>
                             </td>
-                            <td style="padding:.65rem 1rem"><?= roomStatusBadge($r['trang_thai']) ?></td>
+                            <td style="padding:.65rem 1rem"><?= tinDangStatusBadge($r['trang_thai']) ?></td>
                             <td style="padding:.65rem 1rem;font-size:.82rem;color:var(--text-muted);white-space:nowrap">
                                 <?= formatDate($r['created_at']) ?>
                             </td>

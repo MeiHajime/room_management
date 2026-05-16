@@ -5,6 +5,12 @@ requireAdmin();
 $currentUser = getCurrentUser();
 $currentPage = basename($_SERVER['PHP_SELF']);
 $currentDir  = basename(dirname($_SERVER['PHP_SELF']));
+
+// Đếm báo cáo đã thuê đang chờ duyệt (fail-safe nếu bảng chưa tồn tại)
+$_db_header = getDB();
+$_pending_bao_cao = 0;
+$_r = @$_db_header->query("SELECT COUNT(*) FROM bao_cao_da_thue WHERE trang_thai = 'cho_duyet'");
+if ($_r) $_pending_bao_cao = (int)$_r->fetch_row()[0];
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -39,15 +45,28 @@ $currentDir  = basename(dirname($_SERVER['PHP_SELF']));
         <a href="<?= BASE_URL ?>/admin/rooms/index.php" class="sidebar-link <?= ($currentDir === 'rooms') ? 'active' : '' ?>">
             <span class="icon"><i class="bi bi-house-door"></i></span> Phòng trọ
         </a>
+        <a href="<?= BASE_URL ?>/admin/tin-dang/index.php" class="sidebar-link <?= ($currentDir === 'tin-dang') ? 'active' : '' ?>">
+            <span class="icon"><i class="bi bi-megaphone"></i></span> Tin đăng
+        </a>
         <a href="<?= BASE_URL ?>/admin/users/index.php" class="sidebar-link <?= ($currentDir === 'users') ? 'active' : '' ?>">
             <span class="icon"><i class="bi bi-people"></i></span> Người dùng
         </a>
     </div>
 
     <div class="sidebar-section">
-        <span class="sidebar-section-label">Thống kê</span>
+        <span class="sidebar-section-label">Xử lý & Thống kê</span>
+        <a href="<?= BASE_URL ?>/admin/bao-cao-da-thue/index.php"
+           class="sidebar-link <?= ($currentDir === 'bao-cao-da-thue') ? 'active' : '' ?>"
+           style="position:relative">
+            <span class="icon"><i class="bi bi-house-check"></i></span> Báo cáo đã thuê
+            <?php if ($_pending_bao_cao > 0): ?>
+            <span style="margin-left:auto;background:#ef4444;color:#fff;font-size:.65rem;padding:1px 7px;border-radius:999px;font-weight:700">
+                <?= $_pending_bao_cao ?>
+            </span>
+            <?php endif; ?>
+        </a>
         <a href="<?= BASE_URL ?>/admin/reports/index.php" class="sidebar-link <?= ($currentDir === 'reports') ? 'active' : '' ?>">
-            <span class="icon"><i class="bi bi-bar-chart-line"></i></span> Báo cáo
+            <span class="icon"><i class="bi bi-bar-chart-line"></i></span> Thống kê
         </a>
     </div>
 

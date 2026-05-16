@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="auth-wrapper">
     <div class="auth-card" style="max-width:520px">
         <div class="auth-logo">
-            <div class="logo-icon">🏠</div>
+            <a href="<?= BASE_URL ?>/index.php" class="logo-icon">🏠</a>
             <h1 class="auth-title">Tạo tài khoản</h1>
             <p class="auth-subtitle">Đăng ký miễn phí tại VinhRooms</p>
         </div>
@@ -119,6 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                            placeholder="Nhập lại mật khẩu" required>
                 </div>
                 <div class="col-12">
+                    <div class="g-recaptcha" data-sitekey="6LfE9ussAAAAAMopn_3oblIQkG6Ts-d7eE73N2Na"></div>
+                </div>
+                <div class="col-12">
                     <button type="submit" class="btn-primary-custom">
                         <i class="bi bi-person-check me-2"></i>Tạo tài khoản
                     </button>
@@ -134,5 +137,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script></body>
 </html>

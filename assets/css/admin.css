@@ -192,7 +192,7 @@ body.admin-body {
 .data-table th {
     background: var(--admin-bg);
     padding: .85rem 1rem;
-    text-align: left;
+    text-align: center;
     font-size: .78rem; font-weight: 700;
     text-transform: uppercase; letter-spacing: .05em;
     color: var(--admin-muted);
@@ -204,6 +204,7 @@ body.admin-body {
     border-bottom: 1px solid var(--admin-border);
     font-size: .875rem;
     vertical-align: middle;
+    text-align: center;
 }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: rgba(249,115,22,.03); }

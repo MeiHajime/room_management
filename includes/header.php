@@ -19,6 +19,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/style.css">
+    <link rel="stylesheet" href="<?= BASE_URL ?>/assets/css/my-posts.css">
 </head>
 <body>
 
@@ -41,7 +42,6 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     <i class="bi bi-search me-1"></i>Tìm phòng
                 </a>
             </div>
-
             <!-- Auth -->
             <div class="d-flex align-items-center gap-2">
                 <?php if (isLoggedIn()): ?>
@@ -60,6 +60,16 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             <li>
                                 <a class="dropdown-item" href="<?= BASE_URL ?>/profile.php">
                                     <i class="bi bi-person me-2 text-warning"></i>Thông tin cá nhân
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item <?= $currentPage === 'index.php' && strpos($_SERVER['PHP_SELF'], 'my-posts') !== false ? 'active' : '' ?>" href="<?= BASE_URL ?>/my-posts/index.php">
+                                    <i class="bi bi-journal-text me-2 text-warning"></i>Quản lý tin đăng
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="<?= BASE_URL ?>/my-posts/create.php">
+                                    <i class="bi bi-plus-circle me-2 text-success"></i>Đăng tin mới
                                 </a>
                             </li>
                             <?php if (isAdmin()): ?>

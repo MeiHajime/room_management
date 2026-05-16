@@ -1,20 +1,31 @@
 <?php
-// room-detail.php — Chi tiết phòng trọ
+// room-detail.php — Chi tiết tin đăng phòng trọ
 require_once __DIR__ . '/includes/functions.php';
+startSession();
+
 $db = getDB();
-$id = (int)($_GET['id'] ?? 0);
+$id = (int)($_GET['id'] ?? 0);  // id = tin_dang.id
 
 if (!$id) redirect(BASE_URL . '/index.php');
 
+// Lấy thông tin tin đăng + phòng (JOIN 2 bảng)
 $room = $db->query(
-    "SELECT p.*, k.tinh_thanh, k.phuong_xa,
-            u.ho_ten as chu_tro, u.so_dien_thoai as chu_sdt, u.email as chu_email,
-            l.ten as loai_ten
-     FROM phong_tro p
-     JOIN khu_vuc k ON p.khu_vuc_id = k.id
-     LEFT JOIN users u ON p.user_id = u.id
-     LEFT JOIN loai_phong l ON p.loai_phong_id = l.id
-     WHERE p.id = $id AND p.trang_thai = 'da_duyet'
+    "SELECT td.id AS tin_id, td.tieu_de, td.mo_ta, td.gia, td.luot_xem, td.trang_thai AS tin_trang_thai,
+            td.created_at,
+            p.id AS phong_id, p.dien_tich, p.so_phong_ngu, p.so_wc,
+            p.tien_nghi, p.hinh_anh, p.dia_chi, p.gia_goc, p.user_id,
+            p.trang_thai AS phong_trang_thai,
+            k.tinh_thanh, k.phuong_xa,
+            u.ho_ten  AS chu_tro,
+            u.so_dien_thoai AS chu_sdt,
+            u.email   AS chu_email,
+            l.ten     AS loai_ten
+     FROM tin_dang td
+     JOIN phong_tro p    ON td.phong_tro_id = p.id
+     JOIN khu_vuc k      ON p.khu_vuc_id    = k.id
+     LEFT JOIN users u        ON p.user_id       = u.id
+     LEFT JOIN loai_phong l   ON p.loai_phong_id = l.id
+     WHERE td.id = $id AND td.trang_thai = 'da_duyet'
      LIMIT 1"
 )->fetch_assoc();
 
@@ -23,20 +34,33 @@ if (!$room) {
     redirect(BASE_URL . '/index.php');
 }
 
-// Tăng lượt xem
-$db->query("UPDATE phong_tro SET luot_xem = luot_xem + 1 WHERE id = $id");
+// Tăng lượt xem trên tin_dang — chống đếm ảo
+$_SESSION['viewed_rooms'] = $_SESSION['viewed_rooms'] ?? [];
+$isOwner      = isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === (int)$room['user_id'];
+$isAdmin      = isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin';
+$alreadyViewed = in_array($id, $_SESSION['viewed_rooms']);
+
+if (!$isOwner && !$isAdmin && !$alreadyViewed) {
+    $db->query("UPDATE tin_dang SET luot_xem = luot_xem + 1 WHERE id = $id");
+    $_SESSION['viewed_rooms'][] = $id;
+    if (count($_SESSION['viewed_rooms']) > 200) array_shift($_SESSION['viewed_rooms']);
+}
 
 // Ảnh phụ
 $extraImages = $db->query(
-    "SELECT duong_dan FROM hinh_anh_phong WHERE phong_id = $id ORDER BY thu_tu ASC"
+    "SELECT duong_dan FROM hinh_anh_phong WHERE phong_id = {$room['phong_id']} ORDER BY thu_tu ASC"
 )->fetch_all(MYSQLI_ASSOC);
 
-// Phòng liên quan
+// Phòng liên quan — lấy từ tin_dang JOIN phong_tro
+$tinh = $db->real_escape_string($room['tinh_thanh']);
 $relatedRooms = $db->query(
-    "SELECT p.id, p.tieu_de, p.gia, p.dien_tich, p.dia_chi, p.hinh_anh, k.tinh_thanh, k.phuong_xa
-     FROM phong_tro p
-     JOIN khu_vuc k ON p.khu_vuc_id = k.id
-     WHERE p.trang_thai = 'da_duyet' AND p.id != $id AND k.tinh_thanh = '" . $db->real_escape_string($room['tinh_thanh']) . "'
+    "SELECT td.id AS tin_id, td.tieu_de, td.gia,
+            p.dien_tich, p.dia_chi, p.hinh_anh,
+            k.tinh_thanh, k.phuong_xa
+     FROM tin_dang td
+     JOIN phong_tro p ON td.phong_tro_id = p.id
+     JOIN khu_vuc k   ON p.khu_vuc_id = k.id
+     WHERE td.trang_thai = 'da_duyet' AND td.id != $id AND k.tinh_thanh = '$tinh'
      ORDER BY RAND() LIMIT 3"
 )->fetch_all(MYSQLI_ASSOC);
 
@@ -95,6 +119,9 @@ require_once __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="detail-price-big mb-3">
+                    <?php if (!empty($room['gia_goc']) && $room['gia_goc'] > $room['gia']): ?>
+                    <span style="font-size:1rem;text-decoration:line-through;color:var(--text-muted);font-weight:400"><?= formatPrice($room['gia_goc']) ?></span>
+                    <?php endif; ?>
                     <?= formatPrice($room['gia']) ?><span style="font-size:1rem;font-weight:400;color:var(--text-muted)">/tháng</span>
                 </div>
 
@@ -197,7 +224,7 @@ require_once __DIR__ . '/includes/header.php';
                         <div class="room-card-price"><?= formatPrice($r['gia']) ?>/tháng</div>
                     </div>
                     <div class="room-card-body">
-                        <a href="<?= BASE_URL ?>/room-detail.php?id=<?= $r['id'] ?>" class="room-card-title"><?= e($r['tieu_de']) ?></a>
+                        <a href="<?= BASE_URL ?>/room-detail.php?id=<?= $r['tin_id'] ?>" class="room-card-title"><?= e($r['tieu_de']) ?></a>
                         <div class="room-card-location"><i class="bi bi-geo-alt-fill text-warning"></i><?= e($r['dia_chi']) ?></div>
                         <div class="room-meta">
                             <span class="room-meta-item"><i class="bi bi-rulers"></i><?= $r['dien_tich'] ?>m²</span>

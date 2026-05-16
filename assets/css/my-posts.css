@@ -1,0 +1,99 @@
+/* =====================================================
+   my-posts — Shared styles for post management pages
+   ===================================================== */
+
+/* --- Form card --- */
+.post-form { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.form-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,.05);
+}
+
+.form-card-title {
+    font-size: .95rem;
+    font-weight: 800;
+    color: var(--secondary);
+    margin-bottom: 1.25rem;
+    padding-bottom: .75rem;
+    border-bottom: 2px solid var(--border);
+}
+
+.form-label-custom {
+    display: block;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.form-label-custom .required { color: #ef4444; }
+
+.form-control-custom {
+    background: var(--bg) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: 10px !important;
+    color: var(--text) !important;
+    font-size: .9rem !important;
+    padding: .6rem .9rem !important;
+    transition: border-color .18s, box-shadow .18s !important;
+}
+.form-control-custom:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(245,158,11,.15) !important;
+    outline: none !important;
+}
+.form-control-custom::placeholder { color: #9ca3af !important; }
+
+/* --- Upload zone --- */
+.upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: border-color .18s, background .18s;
+}
+.upload-zone:hover { border-color: var(--primary); background: rgba(245,158,11,.03); }
+
+.upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 130px;
+    cursor: pointer;
+    padding: 1rem;
+    text-align: center;
+}
+
+/* --- Action buttons --- */
+.btn-back {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--card-bg); border: 1.5px solid var(--border);
+    color: var(--secondary); text-decoration: none; font-size: 1.1rem;
+    transition: all .18s; flex-shrink: 0;
+}
+.btn-back:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+.btn-submit {
+    display: inline-flex; align-items: center;
+    background: linear-gradient(135deg, var(--primary), #ea580c);
+    color: #fff; border: none; border-radius: 12px;
+    padding: 11px 28px; font-weight: 700; font-size: .9rem; cursor: pointer;
+    transition: transform .18s, box-shadow .18s;
+    box-shadow: 0 4px 14px rgba(245,158,11,.3);
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,158,11,.4); }
+
+.btn-cancel {
+    display: inline-flex; align-items: center;
+    background: var(--card-bg); border: 1.5px solid var(--border);
+    color: var(--text-muted); border-radius: 12px;
+    padding: 11px 22px; font-weight: 600; font-size: .9rem; text-decoration: none;
+    transition: all .18s;
+}
+.btn-cancel:hover { border-color: #ef4444; color: #ef4444; }

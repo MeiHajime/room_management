@@ -42,19 +42,19 @@ $params = [];
 $types  = '';
 
 if ($search !== '') {
-    $where[]  = "(p.tieu_de LIKE ? OR p.dia_chi LIKE ? OR u.ho_ten LIKE ?)";
+    $where[]  = "(p.dia_chi LIKE ? OR u.ho_ten LIKE ?)";
     $kw = "%$search%";
-    $params  = array_merge($params, [$kw, $kw, $kw]);
-    $types  .= 'sss';
+    $params  = array_merge($params, [$kw, $kw]);
+    $types  .= 'ss';
 }
-if (in_array($status, ['cho_duyet', 'da_duyet', 'bi_an'])) {
+if (in_array($status, ['co_san', 'da_cho_thue'])) {
     $where[]  = "p.trang_thai = ?";
     $params[] = $status;
     $types   .= 's';
 }
 
 $whereSQL = implode(' AND ', $where);
-$baseQuery = "FROM phong_tro p LEFT JOIN users u ON p.user_id = u.id LEFT JOIN loai_phong l ON p.loai_phong_id = l.id WHERE $whereSQL";
+$baseQuery = "FROM phong_tro p JOIN khu_vuc kv ON p.khu_vuc_id = kv.id LEFT JOIN users u ON p.user_id = u.id LEFT JOIN loai_phong l ON p.loai_phong_id = l.id WHERE $whereSQL";
 
 // Count
 if (!empty($params)) {
@@ -70,7 +70,7 @@ $pg     = paginate($total, $per_page, $page_num);
 $offset = $pg['offset'];
 
 // Fetch
-$sql = "SELECT p.*, u.ho_ten as chu_tro, l.ten as loai_ten $baseQuery ORDER BY p.created_at DESC LIMIT $per_page OFFSET $offset";
+$sql = "SELECT p.*, kv.tinh_thanh, kv.phuong_xa, u.ho_ten as chu_tro, l.ten as loai_phong $baseQuery ORDER BY p.created_at DESC LIMIT $per_page OFFSET $offset";
 if (!empty($params)) {
     $stmt = $db->prepare($sql);
     $stmt->bind_param($types, ...$params);
@@ -101,10 +101,9 @@ require_once __DIR__ . '/../../includes/admin_header.php';
         <form method="GET" action="" class="search-bar">
             <input type="text" name="q" class="form-control" placeholder="🔍 Tìm theo tiêu đề, địa chỉ, người đăng..." value="<?= e($search) ?>" style="min-width:260px">
             <select name="status" class="form-control" style="width:auto">
-                <option value="">-- Tất cả trạng thái --</option>
-                <option value="cho_duyet" <?= $status === 'cho_duyet' ? 'selected' : '' ?>>⏳ Chờ duyệt</option>
-                <option value="da_duyet"  <?= $status === 'da_duyet'  ? 'selected' : '' ?>>✅ Đã duyệt</option>
-                <option value="bi_an"     <?= $status === 'bi_an'     ? 'selected' : '' ?>>🙈 Đã ẩn</option>
+                <option value="">-- Tất cả phòng --</option>
+                <option value="co_san"  <?= $status === 'co_san'  ? 'selected' : '' ?>>✅ Còn trống</option>
+                <option value="da_cho_thue"     <?= $status === 'da_cho_thue'     ? 'selected' : '' ?>>🙈 Đã cho thuê</option>
             </select>
             <button type="submit" class="btn-search"><i class="bi bi-search"></i> Tìm</button>
             <a href="<?= BASE_URL ?>/admin/rooms/index.php" class="btn-admin-secondary">
@@ -125,18 +124,20 @@ require_once __DIR__ . '/../../includes/admin_header.php';
                 <tr>
                     <th width="50">#</th>
                     <th width="60">Ảnh</th>
-                    <th>Tiêu đề</th>
-                    <th>Người đăng</th>
+                    <th>Chủ phòng</th>
+                    <th>Loại phòng</th>
+                    <th>Diện tích</th>
                     <th>Giá</th>
-                    <th>Loại</th>
+                    <th style="min-width:200px;">Địa chỉ</th>
+                    <th width="70">Phòng ngủ</th>
+                    <th width="60">WC</th>
                     <th>Trạng thái</th>
-                    <th>Ngày đăng</th>
                     <th width="180">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($rooms)): ?>
-                <tr><td colspan="9" class="text-center py-4 text-muted">Không có dữ liệu</td></tr>
+                <tr><td colspan="10" class="text-center py-4 text-muted">Không có dữ liệu</td></tr>
                 <?php endif; ?>
                 <?php foreach ($rooms as $r): ?>
                 <tr>
@@ -148,20 +149,21 @@ require_once __DIR__ . '/../../includes/admin_header.php';
                              onerror="this.src='<?= BASE_URL ?>/assets/images/no-image.svg'">
                     </td>
                     <td style="max-width:220px">
-                        <div style="font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="<?= e($r['tieu_de']) ?>">
-                            <?= e($r['tieu_de']) ?>
-                        </div>
-                        <div style="font-size:.78rem;color:var(--admin-muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis">
-                            <i class="bi bi-geo-alt"></i> <?= e($r['dia_chi']) ?>
+                        <div style="font-weight:600;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="<?= e($r['chu_tro']) ?>">
+                            <?= e($r['chu_tro']) ?>
                         </div>
                     </td>
-                    <td><?= e($r['chu_tro']) ?></td>
+                    <td><?= e($r['loai_phong']) ?></td>
+                    <td><?= e($r['dien_tich']) ?> m2</td>
                     <td style="font-weight:700;color:var(--admin-primary);white-space:nowrap">
-                        <?= formatPrice($r['gia']) ?>
+                        <?= formatPrice($r['gia_goc']) ?>
                     </td>
-                    <td><?= $r['loai_ten'] ? e($r['loai_ten']) : '<span class="text-muted">—</span>' ?></td>
+                    <td style="text-align: center;  " title="<?= e($r['dia_chi']) . ', ' . e($r['phuong_xa']) . ', ' . e($r['tinh_thanh']) ?>">
+                        <?= e($r['dia_chi']) . ', ' . e($r['phuong_xa']) . ', ' . e($r['tinh_thanh']) ?>
+                    </td>
+                    <td style="text-align:center;font-size:.85rem"><?= $r['so_phong_ngu'] ?></td>
+                    <td style="text-align:center;font-size:.85rem"><?= $r['so_wc'] ?></td>
                     <td><?= roomStatusBadge($r['trang_thai']) ?></td>
-                    <td style="white-space:nowrap"><?= formatDate($r['created_at']) ?></td>
                     <td>
                         <div class="d-flex gap-1 flex-wrap">
                             <a href="<?= BASE_URL ?>/room-detail.php?id=<?= $r['id'] ?>" class="btn-action view" target="_blank" title="Xem">

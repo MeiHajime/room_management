@@ -184,12 +184,24 @@ function renderPagination(array $pg, string $baseUrl): void {
 }
 
 // ---------- STATUS LABELS ----------
+
+// Badge cho phong_tro.trang_thai (2 trạng thái mới)
 function roomStatusBadge(string $status): string {
     $map = [
-        'cho_duyet' => ['warning',  'Chờ duyệt'],
-        'da_duyet'  => ['success',  'Đã duyệt'],
-        'bi_an'     => ['secondary','Đã ẩn'],
-        'bi_xoa'    => ['danger',   'Đã xóa'],
+        'co_san'      => ['success',   'Còn trống'],
+        'da_cho_thue' => ['secondary', 'Đã cho thuê'],
+    ];
+    [$color, $label] = $map[$status] ?? ['light', $status];
+    return "<span class=\"badge bg-{$color}\">{$label}</span>";
+}
+
+// Badge cho tin_dang.trang_thai (5 trạng thái)
+function tinDangStatusBadge(string $status): string {
+    $map = [
+        'cho_duyet'  => ['warning',   'Chờ duyệt'],
+        'da_duyet'   => ['success',   'Đã duyệt'],
+        'bi_tu_choi' => ['danger',    'Bị từ chối'],
+        'an'         => ['secondary', 'Đã ẩn'],
     ];
     [$color, $label] = $map[$status] ?? ['light', $status];
     return "<span class=\"badge bg-{$color}\">{$label}</span>";

@@ -2,16 +2,24 @@
 // =====================================================
 // CẤU HÌNH KẾT NỐI DATABASE
 // =====================================================
+
+// Đồng bộ timezone PHP với MySQL (cả hai đều dùng UTC+7)
+date_default_timezone_set('Asia/Ho_Chi_Minh');
+
 define('DB_HOST',     'localhost');
-define('DB_USER',     'root');       // Đổi thành username MySQL của bạn
-define('DB_PASSWORD', '');           // Đổi thành password MySQL của bạn
+define('DB_USER',     'root');
+define('DB_PASSWORD', '');
 define('DB_NAME',     'quan_ly_phong_tro');
 define('DB_CHARSET',  'utf8mb4');
 
+
 // Base URL - đổi nếu chạy khác thư mục
 define('BASE_URL', 'http://localhost:8080/quanLyPhongTro');
-define('UPLOAD_DIR', __DIR__ . '/../uploads/rooms/');
-define('UPLOAD_URL', BASE_URL . '/uploads/rooms/');
+define('UPLOAD_DIR',        __DIR__ . '/../uploads/rooms/');
+define('UPLOAD_URL',        BASE_URL . '/uploads/rooms/');
+define('ASSETS_IMAGE_DIR',  __DIR__ . '/../assets/images/');
+define('ASSETS_IMAGE_URL',  BASE_URL . '/assets/images/');
+
 
 /**
  * Tạo kết nối MySQLi
