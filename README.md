@@ -102,9 +102,9 @@ chmod 755 uploads/rooms/
 
 | Vai trò | Username | Password |
 |---------|----------|----------|
-| Admin   | `admin`        | `password` |
-| User    | `nguyen_van_a` | `password` |
-| User    | `tran_thi_b`   | `password` |
+| Admin   | `admin`        | `Admin@123` |
+| User    | `nguyen_van_a` | `User@123` |
+| User    | `tran_thi_b`   | `User@123` |
 
 > ⚠️ **Lưu ý:** Đổi mật khẩu trước khi deploy lên production!
 >
