@@ -32,8 +32,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if (empty($errors)) {
-            $stmt = $db->prepare("UPDATE users SET ho_ten=?, email=?, so_dien_thoai=?, dia_chi=? WHERE id=?");
-            $stmt->bind_param('ssssi', $ho_ten, $email, $so_dien_thoai, $dia_chi, $uid);
+            // Xử lý upload avatar — dùng uploadImage() lưu vào uploads/
+            $avatarPath = $currentUser['avatar']; // giữ nguyên nếu không chọn ảnh mới
+            $avatarFile = $_FILES['avatar'] ?? null;
+            if ($avatarFile && $avatarFile['error'] === UPLOAD_ERR_OK && $avatarFile['size'] > 0) {
+                $uploaded = uploadImage($avatarFile, 'avatar');
+                if ($uploaded === false) {
+                    $errors[] = 'Avatar phải là file ảnh hợp lệ (JPG, PNG, GIF, WEBP) và nhỏ hơn 5MB.';
+                } else {
+                    $avatarPath = $uploaded; // chỉ lưu tên file thuần
+                }
+            }
+        }
+
+        if (empty($errors)) {
+            $stmt = $db->prepare("UPDATE users SET ho_ten=?, email=?, so_dien_thoai=?, dia_chi=?, avatar=? WHERE id=?");
+            $stmt->bind_param('sssssi', $ho_ten, $email, $so_dien_thoai, $dia_chi, $avatarPath, $uid);
             if ($stmt->execute()) {
                 $_SESSION['user_name'] = $ho_ten;
                 setFlash('success', 'Cập nhật thông tin thành công!');
@@ -98,8 +112,14 @@ require_once __DIR__ . '/includes/header.php';
         <!-- Profile card -->
         <div class="col-lg-4">
             <div class="detail-info-card text-center mb-4">
-                <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#ea580c);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.2rem;font-weight:800;margin:0 auto 1rem">
-                    <?= strtoupper(mb_substr($currentUser['ho_ten'] ?? 'U', 0, 1)) ?>
+                <div class="avatar-wrapper">
+                    <img id="avatarPreview" src="<?= getImageUrl($currentUser['avatar'] ?? '') ?>" class="avatar-img">
+
+                    <label for="upload-avatar" class="avatar-overlay">
+                        <i class="bi bi-image"></i>
+                    </label>
+
+                    <input type="file" id="upload-avatar" hidden>
                 </div>
                 <h5 style="font-weight:800"><?= e($currentUser['ho_ten']) ?></h5>
                 <p style="color:var(--text-muted);font-size:.875rem">@<?= e($currentUser['username']) ?></p>
@@ -142,8 +162,9 @@ require_once __DIR__ . '/includes/header.php';
                 <h6 style="font-weight:800;margin-bottom:1.25rem">
                     <i class="bi bi-person-gear me-2 text-warning"></i>Cập nhật thông tin
                 </h6>
-                <form method="POST">
+                <form method="POST" enctype="multipart/form-data" id="formUpdateInfo">
                     <input type="hidden" name="_action" value="update_info">
+                    <input type="file" name="avatar" id="avatarFileInput" accept="image/*" hidden>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label style="font-size:.85rem;font-weight:600;color:var(--text-muted)">Họ và tên <span class="text-danger">*</span></label>
@@ -262,5 +283,113 @@ require_once __DIR__ . '/includes/header.php';
         </div>
     </div>
 </div>
+<style>
+    .avatar-wrapper {
+    position: relative;
+    left: 37%;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+}
 
+/* Avatar */
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Overlay (ẩn mặc định) */
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(113, 113, 113, 0.57);
+    opacity: 0;
+    transition: 0.3s ease;
+}
+.avatar-overlay i{
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Hover trigger */
+.avatar-wrapper:hover .avatar-overlay {
+    cursor: pointer;
+    opacity: 1;
+}
+</style>
+<div id="avatarToast" style="
+    display:none;
+    position:fixed;
+    bottom:1.5rem;
+    right:1.5rem;
+    z-index:9999;
+    background:#ef4444;
+    color:#fff;
+    padding:.75rem 1.25rem;
+    border-radius:12px;
+    font-size:.875rem;
+    font-weight:600;
+    box-shadow:0 4px 20px rgba(0,0,0,.25);
+    animation: slideIn .3s ease;
+"><i class="bi bi-exclamation-circle me-2"></i><span id="avatarToastMsg"></span></div>
+
+<style>
+@keyframes slideIn {
+    from { opacity:0; transform:translateY(12px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+</style>
+
+<script>
+const ALLOWED_TYPES = ['image/jpeg','image/png','image/gif','image/webp'];
+const ALLOWED_EXT  = /\.(jpe?g|png|gif|webp)$/i;
+
+function showAvatarError(msg) {
+    const toast = document.getElementById('avatarToast');
+    document.getElementById('avatarToastMsg').textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 4000);
+}
+
+// Khi click label overlay => mở file picker ngoài (upload-avatar)
+// Nhưng file thực sự nằm trong form là avatarFileInput
+document.getElementById('upload-avatar').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Validate kiểu file
+    if (!ALLOWED_TYPES.includes(file.type) || !ALLOWED_EXT.test(file.name)) {
+        showAvatarError('Chỉ chấp nhận file ảnh: JPG, PNG, GIF, WEBP.');
+        this.value = '';
+        return;
+    }
+
+    // Hiển thị preview ngay lập tức
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        document.getElementById('avatarPreview').src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Đồng bộ file sang input trong form để submit cùng
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('avatarFileInput').files = dt.files;
+});
+</script>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

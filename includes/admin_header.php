@@ -6,11 +6,14 @@ $currentUser = getCurrentUser();
 $currentPage = basename($_SERVER['PHP_SELF']);
 $currentDir  = basename(dirname($_SERVER['PHP_SELF']));
 
-// Đếm báo cáo đã thuê đang chờ duyệt (fail-safe nếu bảng chưa tồn tại)
+// Đếm số bản ghi chờ duyệt (fail-safe nếu bảng chưa tồn tại)
 $_db_header = getDB();
-$_pending_bao_cao = 0;
+$_pending_bao_cao  = 0;
+$_pending_tin_dang = 0;
 $_r = @$_db_header->query("SELECT COUNT(*) FROM bao_cao_da_thue WHERE trang_thai = 'cho_duyet'");
 if ($_r) $_pending_bao_cao = (int)$_r->fetch_row()[0];
+$_r = @$_db_header->query("SELECT COUNT(*) FROM tin_dang WHERE trang_thai = 'cho_duyet'");
+if ($_r) $_pending_tin_dang = (int)$_r->fetch_row()[0];
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -45,8 +48,15 @@ if ($_r) $_pending_bao_cao = (int)$_r->fetch_row()[0];
         <a href="<?= BASE_URL ?>/admin/rooms/index.php" class="sidebar-link <?= ($currentDir === 'rooms') ? 'active' : '' ?>">
             <span class="icon"><i class="bi bi-house-door"></i></span> Phòng trọ
         </a>
-        <a href="<?= BASE_URL ?>/admin/tin-dang/index.php" class="sidebar-link <?= ($currentDir === 'tin-dang') ? 'active' : '' ?>">
+        <a href="<?= BASE_URL ?>/admin/tin-dang/index.php"
+           class="sidebar-link <?= ($currentDir === 'tin-dang') ? 'active' : '' ?>"
+           style="position:relative">
             <span class="icon"><i class="bi bi-megaphone"></i></span> Tin đăng
+            <?php if ($_pending_tin_dang > 0): ?>
+            <span style="margin-left:auto;background:#ef4444;color:#fff;font-size:.65rem;padding:1px 7px;border-radius:999px;font-weight:700">
+                <?= $_pending_tin_dang ?>
+            </span>
+            <?php endif; ?>
         </a>
         <a href="<?= BASE_URL ?>/admin/users/index.php" class="sidebar-link <?= ($currentDir === 'users') ? 'active' : '' ?>">
             <span class="icon"><i class="bi bi-people"></i></span> Người dùng

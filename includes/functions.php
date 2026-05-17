@@ -131,10 +131,9 @@ function uploadImage(array $file, string $prefix = 'room'): string|false {
 }
 
 function getImageUrl(?string $filename): string {
-    if (!$filename) {
-        return BASE_URL . '/assets/images/no-image.svg';
+    if (file_exists(BASE_URL . $filename)) {
+        return BASE_URL . $filename;
     }
-
     // Đường dẫn tuyệt đối bắt đầu bằng '/' (vd: /assets/images/phong1_1.jpg)
     // → kiểm tra file vật lý từ document root của project
     if ($filename[0] === '/') {
