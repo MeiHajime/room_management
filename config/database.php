@@ -14,7 +14,7 @@ define('DB_CHARSET',  'utf8mb4');
 
 
 // Base URL - đổi nếu chạy khác thư mục
-define('BASE_URL', 'http://localhost:8080/quanLyPhongTro');
+define('BASE_URL', 'http://localhost/quanLyPhongTro');
 define('UPLOAD_DIR',        __DIR__ . '/../uploads/users/');
 define('UPLOAD_URL',        BASE_URL . '/uploads/users/');
 define('ASSETS_IMAGE_DIR',  __DIR__ . '/../assets/images/');
