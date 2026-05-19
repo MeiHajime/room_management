@@ -1,5 +1,5 @@
 <?php
-// admin/users/add.php — Thêm tài khoản người dùng
+// admin/users/add.php 
 require_once __DIR__ . '/../../includes/functions.php';
 requireAdmin();
 $db = getDB();

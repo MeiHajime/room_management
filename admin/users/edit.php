@@ -1,5 +1,5 @@
 <?php
-// admin/users/edit.php — Sửa tài khoản + đổi mật khẩu
+// admin/users/edit.php — Sửa tài khoản 
 require_once __DIR__ . '/../../includes/functions.php';
 requireAdmin();
 $db = getDB();

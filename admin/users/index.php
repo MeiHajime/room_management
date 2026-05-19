@@ -1,5 +1,5 @@
 <?php
-// admin/users/index.php — Quản lý tài khoản người dùng
+// admin/users/index.php — Quản lý tài khoản 
 require_once __DIR__ . '/../../includes/functions.php';
 requireAdmin();
 $db = getDB();
